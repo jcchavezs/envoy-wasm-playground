@@ -59,7 +59,7 @@ static_resources:
               - endpoint:
                   address:
                     socket_address:
-                      address: httpmole
+                      address: upstream
                       port_value: 10080
 
 admin:

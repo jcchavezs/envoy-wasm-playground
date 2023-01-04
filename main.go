@@ -49,7 +49,7 @@ func (ctx *testContext) OnHttpRequestHeaders(numHeaders int, endOfStream bool) t
 	}
 
 	for _, h := range hs {
-		proxywasm.LogInfof("request header --> %s: %s", h[0], h[1])
+		proxywasm.LogDebugf("request header --> %q: %q", h[0], h[1])
 	}
 
 	return types.ActionContinue
@@ -62,12 +62,13 @@ func (ctx *testContext) OnHttpRequestBody(bodySize int, endOfStream bool) types.
 		return types.ActionPause
 	}
 
+	proxywasm.LogDebugf("about to get request body")
 	body, err := proxywasm.GetHttpRequestBody(0, bodySize)
 	if err != nil {
 		proxywasm.LogCriticalf("failed to get request body: %v", err)
 	}
 
-	proxywasm.LogInfof("request body --> %q", body)
+	proxywasm.LogDebugf("request body --> %q", body)
 
 	return types.ActionContinue
 }
@@ -80,7 +81,7 @@ func (ctx *testContext) OnHttpResponseHeaders(numHeaders int, endOfStream bool) 
 	}
 
 	for _, h := range hs {
-		proxywasm.LogInfof("response header <-- %s: %s", h[0], h[1])
+		proxywasm.LogDebugf("response header <-- %q: %q", h[0], h[1])
 	}
 	return types.ActionContinue
 }
@@ -92,12 +93,13 @@ func (ctx *testContext) OnHttpResponseBody(bodySize int, endOfStream bool) types
 		return types.ActionPause
 	}
 
+	proxywasm.LogDebugf("about to get response body")
 	body, err := proxywasm.GetHttpResponseBody(0, bodySize)
 	if err != nil {
 		proxywasm.LogCriticalf("failed to get response body: %v", err)
 	}
 
-	proxywasm.LogInfof("response body --> %q", body)
+	proxywasm.LogDebugf("response body --> %q", body)
 
 	return types.ActionContinue
 }

@@ -5,7 +5,7 @@ This project contains a setup to debug envoy request lifecycle for WASM filters.
 ## Getting started
 
 ```bash
-make run
+make build run
 
 curl -i localhost:8080
 ```

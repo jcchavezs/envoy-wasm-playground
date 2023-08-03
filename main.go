@@ -31,9 +31,21 @@ func (ctx *pluginContext) NewHttpContext(contextID uint32) types.HttpContext {
 	return &testContext{contextID: contextID}
 }
 
+const tickMilliseconds uint32 = 100
+
 // Override types.DefaultPluginContext.
 func (ctx *pluginContext) OnPluginStart(pluginConfigurationSize int) types.OnPluginStartStatus {
+	if err := proxywasm.SetTickPeriodMilliSeconds(tickMilliseconds); err != nil {
+		proxywasm.LogCriticalf("failed to set tick period: %v", err)
+		return types.OnPluginStartStatusFailed
+	}
+	proxywasm.LogInfof("set tick period milliseconds: %d", tickMilliseconds)
+
 	return types.OnPluginStartStatusOK
+}
+
+func (ctx *pluginContext) OnTick() {
+	// proxywasm.LogDebugf("OnTick")
 }
 
 type testContext struct {
@@ -58,7 +70,7 @@ func (ctx *testContext) OnHttpRequestHeaders(numHeaders int, endOfStream bool) t
 // Override types.DefaultHttpContext.
 func (ctx *testContext) OnHttpRequestBody(bodySize int, endOfStream bool) types.Action {
 	if endOfStream {
-		proxywasm.LogDebugf("request body end of stream, body size: %d", bodySize)
+		proxywasm.LogDebugf("request body at end of stream, body size: %d", bodySize)
 		return types.ActionPause
 	}
 

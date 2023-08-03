@@ -1,24 +1,14 @@
 services:
   upstream:
-    image: jcchavezs/httpmole
+    image: jcchavezs/httpmole:latest
     ports:
       - 10080:10080
     volumes:
       - .:/conf
     command: [ "-response-file", "/conf/response.json" ]
 
-  chown:
-    image: alpine:3.16
-    command:
-      - /bin/sh
-      - -c
-      - chown -R 101:101 /home/envoy/logs
-    volumes:
-      - logs:/home/envoy/logs:rw
-
   envoy:
     depends_on:
-      - chown
       - upstream
     image: ${ENVOY_IMAGE:-envoyproxy/envoy:v1.23-latest}
     command:
@@ -34,21 +24,7 @@ services:
     volumes:
       - ./build:/build
       - .:/conf
-      - logs:/home/envoy/logs:rw
+      - ./logs:/home/envoy/logs:rw
     ports:
       - 8080:8080
       - 8082:8082
-
-  wasm-logs:
-    depends_on:
-      - envoy
-    image: debian:11-slim
-    entrypoint: bash
-    command:
-      - -c
-      - tail -c +0 -f /home/envoy/logs/envoy.log | grep "\[wasm\]"
-    volumes:
-      - logs:/home/envoy/logs:ro
-
-volumes:
-  logs:
